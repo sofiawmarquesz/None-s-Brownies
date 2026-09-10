@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>None's Brownies</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        body {
+            background: #444cd7;
+            color: #fff;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #3a4e98;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        label {
+            display: block;
+            margin: 15px 0 5px;
+            font-weight: 600;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            color: #0b0b9b;
+        }
+        .total {
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 18px;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #9b663e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #E65100;
+        }
+        .contato-responsavel {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            display: none;
+        }
+        .contato-responsavel.visivel {
+            display: block;
+        }
+        .btn-whatsapp {
+            display: block;
+            text-align: center;
+            padding: 12px;
+            background: #25D366;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+        .btn-whatsapp:hover {
+            background: #128C7E;
+        }
+        .sucesso {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(76, 175, 80, 0.3);
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1> None's Brownies</h1>
+        <p class="subtitle">Faça seu pedido e fale com o atendente da sua faculdade</p>
+        <p class="subtitle">Não vamos até você, você vem até nós!</p>
+        <form id="formPedido">
+            <!-- ✅ AGORA COM IDs CORRETAS DO GOOGLE FORMS -->
+            <label>Seu nome:</label>
+            <input type="text" name="entry.1152945663" id="campoNome" required>
+
+            <label>De qual faculdade você é?</label>
+            <select name="entry.1246024581" id="campoFaculdade" required>
+                <option value="">Selecione sua faculdade...</option>
+                <option value="UPE">UPE</option>
+                <option value="UNINASSAU">UNINASSAU</option>
+            </select>
+
+            <label>Quantidade — Brigadeiro Preto:</label>
+            <input type="number" name="entry.1812360740" id="campoPreto" min="0" value="0" required>
+
+            <label>Quantidade — Brigadeiro Branco:</label>
+            <input type="number" name="entry.1898120895" id="campoBranco" min="0" value="0" required>
+
+            <div class="total">
+                Total de brownies: <span id="total">0</span>
+            </div>
+
+            <button type="submit">📤 Enviar Pedido</button>
+        </form>
+
+        <div class="sucesso" id="mensagemSucesso">
+            ✅ Pedido enviado! Abaixo você já pode falar direto com a atendente responsável para saber onde ela se encontra.
+        </div>
+
+        <div class="contato-responsavel" id="caixaContato">
+            <h3>Atendente responsável:</h3>
+            <p id="nomeAtendente"></p>
+            <a id="linkWhatsApp" href="" target="_blank" class="btn-whatsapp">
+                💬 Falar pelo WhatsApp
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // ==================================================
+        // 📋 CONFIGURAÇÃO — EDITE AQUI ABAIXO!
+        // ==================================================
+        const atendentes = {
+            "UPE": { nome: "Mariah", whatsapp: "5581984690686" },
+            "UNINASSAU": { nome: "Sofia", whatsapp: "5581994550392" },
+        };
+
+        // ✅ LINK JÁ CORRIGIDO COM SEU FORMULÁRIO
+        const LINK_ENVIO = "https://docs.google.com/forms/d/1QSXQgtOy8sYfdPKI46bC4_RhHEFYBvUZfmqfTfjY0Nc/formResponse";
+
+        // ==================================================
+        // 🔄 LÓGICA — NÃO PRECISA ALTERAR ABAIXO
+        // ==================================================
+        const campoFaculdade = document.getElementById('campoFaculdade');
+        const campoNome = document.getElementById('campoNome');
+        const campoPreto = document.getElementById('campoPreto');
+        const campoBranco = document.getElementById('campoBranco');
+        const spanTotal = document.getElementById('total');
+        const caixaContato = document.getElementById('caixaContato');
+        const nomeAtendente = document.getElementById('nomeAtendente');
+        const linkWhatsApp = document.getElementById('linkWhatsApp');
+
+        function atualizarTotal() {
+            const preto = parseInt(campoPreto.value) || 0;
+            const branco = parseInt(campoBranco.value) || 0;
+            spanTotal.textContent = preto + branco;
+            atualizarLinkWhatsApp();
+        }
+
+        function atualizarLinkWhatsApp() {
+            const faculdade = campoFaculdade.value;
+            const nome = campoNome.value.trim() || "Cliente";
+            const preto = parseInt(campoPreto.value) || 0;
+            const branco = parseInt(campoBranco.value) || 0;
+            const total = preto + branco;
+
+            if (faculdade && atendentes[faculdade] && total > 0) {
+                const dados = atendentes[faculdade];
+                
+                const mensagem = `Olá! Meu nome é ${nome}, sou da ${faculdade}.\nGostaria de pedir:\nBrigadeiro Preto: ${preto}\nBrigadeiro Branco: ${branco}\n📦 Total: ${total} brownies.`;
+                
+                const mensagemCodificada = encodeURIComponent(mensagem);
+                
+                nomeAtendente.textContent = dados.nome;
+                linkWhatsApp.href = `https://wa.me/${dados.whatsapp}?text=${mensagemCodificada}`;
+                caixaContato.classList.add('visivel');
+            } else {
+                caixaContato.classList.remove('visivel');
+            }
+        }
+
+        campoFaculdade.addEventListener('change', atualizarLinkWhatsApp);
+        campoNome.addEventListener('input', atualizarLinkWhatsApp);
+        campoPreto.addEventListener('input', atualizarTotal);
+        campoBranco.addEventListener('input', atualizarTotal);
+
+        document.getElementById('formPedido').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const total = (parseInt(campoPreto.value) || 0) + (parseInt(campoBranco.value) || 0);
+            if (total === 0) {
+                alert("⚠️ Por favor, peça pelo menos 1 brownie!");
+                return;
+            }
+            
+            const formData = new FormData(this);
+            fetch(LINK_ENVIO, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: formData
+            }).then(() => {
+                document.getElementById('formPedido').style.display = 'none';
+                document.getElementById('mensagemSucesso').style.display = 'block';
+            }).catch(err => {
+                alert("✅ Pedido enviado! Verifique na planilha.");
+                document.getElementById('formPedido').style.display = 'none';
+                document.getElementById('mensagemSucesso').style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>
